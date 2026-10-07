@@ -1,0 +1,6 @@
+{
+  "name": "First Conditional Master: Study Habits",
+  "description": "An interactive English grammar learning app featuring visual guides, clause breakdowns, affirmative, negative, interrogative structures, modal exceptions, and a 10-sentence matching game on effective study habits.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
