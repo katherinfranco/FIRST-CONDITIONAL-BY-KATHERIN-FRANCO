@@ -36,17 +36,17 @@ export const HabitsLibrary: React.FC = () => {
     <div className="space-y-8 pb-16">
       
       {/* Header */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+      <div className="rounded-3xl p-6 sm:p-8 border shadow-xs" style={{ backgroundColor: '#b0bded', borderColor: '#0e0d0d' }}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-800">
               <BookmarkCheck className="w-3.5 h-3.5 text-teal-600" />
               <span>Complete Habits Reference</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight italic" style={{ color: '#600505', fontStyle: 'italic' }}>
               10 Effective English Learner Habits
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <p className="text-xs sm:text-sm leading-relaxed" style={{ color: '#0059a7', fontWeight: 'bold' }}>
               Explore the exact 10 First Conditional sentences used in this course. Each card highlights the grammar structure, verb tenses, and provides the psychological learning reason behind each study habit.
             </p>
           </div>
@@ -59,56 +59,70 @@ export const HabitsLibrary: React.FC = () => {
               placeholder="Search habits or words..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              style={{ backgroundColor: '#a8d9fe', color: '#0b0c0d', fontWeight: 'normal' }}
             />
           </div>
         </div>
       </div>
 
-      {/* Cards List */}
+      {/* Cards List in Varied Light Pastel Colors */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredSentences.map((habit) => {
+        {filteredSentences.map((habit, idx) => {
           const isInverted = Boolean(invertedMap[habit.id]);
+
+          // Cycle through clear light pastel colors: pink, purple, amber, sky, emerald
+          const pastelPalettes = [
+            { card: 'bg-pink-50/70 border-pink-200 hover:border-pink-300', num: 'bg-pink-600' },
+            { card: 'bg-purple-50/70 border-purple-200 hover:border-purple-300', num: 'bg-purple-600' },
+            { card: 'bg-amber-50/70 border-amber-200 hover:border-amber-300', num: 'bg-amber-600' },
+            { card: 'bg-sky-50/70 border-sky-200 hover:border-sky-300', num: 'bg-sky-600' },
+            { card: 'bg-emerald-50/70 border-emerald-200 hover:border-emerald-300', num: 'bg-emerald-600' },
+          ];
+          const palette = pastelPalettes[idx % pastelPalettes.length];
 
           return (
             <div
               key={habit.id}
-              className="bg-white rounded-3xl p-6 border border-slate-200/80 hover:border-indigo-300 transition-all shadow-xs flex flex-col justify-between space-y-4"
+              className={`rounded-3xl p-6 border-2 ${palette.card} transition-all shadow-xs flex flex-col justify-between space-y-4`}
+              style={idx === 4 ? { backgroundColor: '#b8f8dd' } : undefined}
             >
               {/* Card Header */}
-              <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0">
+                  <span className={`w-8 h-8 rounded-xl ${palette.num} text-white text-xs font-black flex items-center justify-center shrink-0 shadow-xs`}>
                     #{habit.id}
                   </span>
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">{habit.habitTitle}</h3>
-                    <span className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                    <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
                       Category: {habit.category}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
+                  {/* Large Prominent Audio Button */}
                   <button
                     onClick={() => speakEnglish(isInverted ? habit.invertedSentence : habit.fullSentence)}
-                    className="p-2 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 border border-slate-200 transition-colors cursor-pointer"
+                    className="p-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-500/20 active:scale-95 transition-all cursor-pointer"
                     title="Listen aloud"
                   >
-                    <Volume2 className="w-4 h-4" />
+                    <Volume2 className="w-5 h-5 text-amber-200" />
+                    <span className="hidden sm:inline">Listen</span>
                   </button>
 
                   <button
                     onClick={() => toggleInverted(habit.id)}
-                    className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                    className={`p-2.5 px-3 rounded-xl border-2 text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer ${
                       isInverted 
-                        ? 'bg-violet-600 text-white border-violet-700' 
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                        ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white border-purple-600 shadow-md shadow-purple-500/20' 
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'
                     }`}
                     title="Invert clause order"
                   >
                     <ArrowLeftRight className="w-4 h-4" />
-                    <span className="text-[10px] hidden sm:inline">Flip</span>
+                    <span className="text-[11px] hidden sm:inline">Flip</span>
                   </button>
                 </div>
               </div>

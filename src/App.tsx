@@ -27,7 +27,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" style={{ backgroundColor: '#dcfbba' }}>
         {activeTab === 'grammar' && (
           <GrammarGuide 
             onStartGame={() => setActiveTab('game')} 
@@ -59,38 +59,43 @@ export default function App() {
             <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
               <GraduationCap className="w-3.5 h-3.5" />
             </div>
-            <span className="font-semibold text-slate-800">First Conditional Master</span>
-            <span>— 10 Habits of Effective English Learners</span>
+            <span className="text-slate-800" style={{ color: '#653d93', fontWeight: 'bold' }}>First Conditional Master</span>
+            <span style={{ color: '#ff2828', fontWeight: 'bold' }}>— 10 Habits of Effective English Learners</span>
           </div>
 
           <div className="flex items-center gap-6 text-slate-600">
             <button 
               onClick={() => setActiveTab('grammar')} 
               className="hover:text-indigo-600 transition-colors cursor-pointer"
+              style={{ fontWeight: 'bold', color: '#2a478c' }}
             >
               Grammar Theory
             </button>
             <button 
               onClick={() => setActiveTab('game')} 
               className="hover:text-indigo-600 transition-colors cursor-pointer"
+              style={{ fontWeight: 'bold', color: '#014d01' }}
             >
               Matching Game
             </button>
             <button 
               onClick={() => setActiveTab('inverter')} 
               className="hover:text-indigo-600 transition-colors cursor-pointer"
+              style={{ color: '#063d3b', fontWeight: 'bold' }}
             >
               Comma Lab
             </button>
             <button 
               onClick={() => setActiveTab('habits')} 
               className="hover:text-indigo-600 transition-colors cursor-pointer"
+              style={{ fontWeight: 'bold', color: '#580a59' }}
             >
               Habits Library
             </button>
             <button 
               onClick={() => setIsInstructionsOpen(true)} 
-              className="hover:text-indigo-600 transition-colors cursor-pointer text-indigo-600 font-semibold"
+              className="hover:text-indigo-600 transition-colors cursor-pointer text-indigo-600"
+              style={{ fontWeight: 'bold' }}
             >
               How to Use
             </button>

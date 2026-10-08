@@ -253,17 +253,17 @@ export const MatchingGame: React.FC = () => {
     <div className="space-y-6">
       
       {/* Game Dashboard Header */}
-      <div className="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs">
+      <div className="rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs" style={{ backgroundColor: '#ffb3b3' }}>
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1" style={{ fontSize: '20px' }}>
               <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800">
                 10 Habit Pairs Challenge
               </span>
-              <span className="text-xs text-slate-500">First Conditional Practice</span>
+              <span className="text-slate-500" style={{ fontSize: '18px', fontWeight: 'bold' }}>First Conditional Practice</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight italic" style={{ fontStyle: 'italic' }}>
               Habits Matching Game
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
@@ -293,37 +293,37 @@ export const MatchingGame: React.FC = () => {
             </div>
 
             {/* Progress */}
-            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 shadow-xs">
-              <CheckCircle2 className="w-4 h-4 text-indigo-600" />
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 shadow-xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <div>
-                <div className="text-[10px] text-indigo-600 uppercase tracking-wider font-semibold">Matched</div>
+                <div className="text-[10px] text-emerald-700 uppercase tracking-wider font-semibold">Matched</div>
                 <div className="text-base font-black font-mono leading-none">{matchesCount}/10</div>
               </div>
             </div>
 
             {/* Timer */}
-            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 shadow-xs">
-              <Timer className="w-4 h-4 text-slate-500" />
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 shadow-xs">
+              <Timer className="w-4 h-4 text-purple-600" />
               <div>
-                <div className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Time</div>
+                <div className="text-[10px] text-purple-700 uppercase tracking-wider font-semibold">Time</div>
                 <div className="text-base font-black font-mono leading-none">{formattedTime}</div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+            {/* Action Buttons in Bright Colors */}
+            <div className="flex items-center gap-2 ml-auto sm:ml-0">
               <button
                 onClick={handleGiveHint}
-                className="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold transition-all shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer flex items-center gap-1.5"
                 title="Get a hint (-10 points)"
               >
-                <Lightbulb className="w-4 h-4 text-amber-600" />
+                <Lightbulb className="w-4 h-4 text-amber-100" />
                 <span className="hidden sm:inline">Hint</span>
               </button>
 
               <button
                 onClick={initGame}
-                className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-bold transition-all shadow-md shadow-sky-500/20 active:scale-95 cursor-pointer flex items-center gap-1.5"
                 title="Reset game"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -346,7 +346,7 @@ export const MatchingGame: React.FC = () => {
 
       {/* Real-time Dynamic Feedback Banner */}
       {feedback.message && (
-        <div className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs ${
+        <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs ${
           feedback.type === 'success' 
             ? 'bg-emerald-50 border-emerald-200 text-emerald-900' 
             : feedback.type === 'error'
@@ -374,10 +374,10 @@ export const MatchingGame: React.FC = () => {
           {feedback.sentence && (
             <button
               onClick={() => speakEnglish(feedback.sentence!.fullSentence)}
-              className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-white/80 hover:bg-white text-slate-700 border border-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-xs"
+              className="self-start sm:self-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-bold text-xs shadow-md shadow-indigo-500/25 flex items-center gap-2 transition-all active:scale-95 cursor-pointer shrink-0"
             >
-              <Volume2 className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Listen</span>
+              <Volume2 className="w-5 h-5 text-amber-200" />
+              <span>Listen Aloud</span>
             </button>
           )}
         </div>
@@ -387,7 +387,7 @@ export const MatchingGame: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         
         {/* LEFT COLUMN: CONDITIONS (If-Clauses) */}
-        <div className="bg-slate-50/70 rounded-3xl p-4 sm:p-6 border border-slate-200/80 space-y-3">
+        <div className="rounded-3xl p-4 sm:p-6 border border-slate-200/80 space-y-3" style={{ backgroundColor: '#b9e0f4' }}>
           <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
@@ -400,7 +400,7 @@ export const MatchingGame: React.FC = () => {
             </span>
           </div>
 
-          <p className="text-xs text-slate-500 pb-2">
+          <p className="text-slate-500 pb-2" style={{ fontSize: '15px', fontWeight: 'bold' }}>
             Click an If-Clause to select it:
           </p>
 
@@ -453,7 +453,7 @@ export const MatchingGame: React.FC = () => {
         </div>
 
         {/* RIGHT COLUMN: RESULTS (Main Clauses) */}
-        <div className="bg-slate-50/70 rounded-3xl p-4 sm:p-6 border border-slate-200/80 space-y-3">
+        <div className="rounded-3xl p-4 sm:p-6 border border-slate-200/80 space-y-3" style={{ backgroundColor: '#bbe4ff' }}>
           <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-indigo-500"></span>
@@ -466,7 +466,7 @@ export const MatchingGame: React.FC = () => {
             </span>
           </div>
 
-          <p className="text-xs text-slate-500 pb-2">
+          <p className="text-slate-500 pb-2" style={{ fontSize: '15px', fontWeight: 'bold' }}>
             Click the matching consequence for the selected condition:
           </p>
 
