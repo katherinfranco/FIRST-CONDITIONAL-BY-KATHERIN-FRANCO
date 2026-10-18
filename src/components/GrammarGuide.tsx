@@ -5,17 +5,21 @@ import {
   AlertTriangle, 
   Volume2, 
   ArrowRight, 
-  HelpCircle, 
   Zap, 
   Lightbulb, 
   Info,
   ShieldAlert,
   Layers,
   Clock,
-  BookMarked
+  BookMarked,
+  BookOpen,
+  Gamepad2,
+  Rocket
 } from 'lucide-react';
 import { GRAMMAR_STRUCTURES, MODAL_EXCEPTIONS, GOLDEN_RULES } from '../data/firstConditionalData';
-import { speakEnglish } from '../utils/audio';
+import { speakEnglish, sound } from '../utils/audio';
+import { SparkyAvatar } from './SparkyAvatar';
+import { BoxFlankIcons } from './FloatingBackgroundIcons';
 
 import heroImg from '../assets/images/student_study_habits_1791337088765.jpg';
 import practiceImg from '../assets/images/english_speaking_practice_1791337102193.jpg';
@@ -23,32 +27,85 @@ import practiceImg from '../assets/images/english_speaking_practice_179133710219
 interface GrammarGuideProps {
   onStartGame: () => void;
   onGoToOrderLab: () => void;
+  onOpenInstructions?: () => void;
+  onGoToHabits?: () => void;
 }
 
-export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToOrderLab }) => {
+export const GrammarGuide: React.FC<GrammarGuideProps> = ({ 
+  onStartGame, 
+  onGoToOrderLab, 
+  onOpenInstructions,
+  onGoToHabits 
+}) => {
   const [selectedStructure, setSelectedStructure] = useState<'affirmative' | 'negative' | 'interrogative'>('affirmative');
-  const [activeModal, setActiveModal] = useState<'can' | 'must' | 'may' | 'might'>('can');
+  const [activeModal, setActiveModal] = useState<'can' | 'must' | 'should'>('can');
 
   const currentStructureData = GRAMMAR_STRUCTURES.find((s) => s.type === selectedStructure)!;
   const currentModalData = MODAL_EXCEPTIONS.find((m) => m.modal === activeModal)!;
+
+  const handleStartMission = () => {
+    sound.playSelect();
+    const el = document.getElementById('uses-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleOpenManual = () => {
+    sound.playSelect();
+    if (onOpenInstructions) {
+      onOpenInstructions();
+    }
+  };
+
+  const handleJumpToGame = () => {
+    sound.playSuccess();
+    onStartGame();
+  };
 
   return (
     <div className="space-y-12 pb-16">
       
       {/* Hero Visual Section (Changed to light theme, removed badge, 3D animated colorful title, colorful buttons) */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-50/90 via-purple-50/70 to-pink-50/90 text-slate-800 shadow-xl border-2 border-indigo-100/90">
-        <div 
-          className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 p-6 sm:p-10 lg:p-12 border-2 rounded-3xl" 
-          style={{ backgroundColor: '#fefe97', borderColor: '#3b0202', borderStyle: 'solid' }}
-        >
+      <div className="relative">
+        <BoxFlankIcons 
+          leftIcon="book" 
+          rightIcon="rocket" 
+          leftTop="22%" 
+          rightTop="65%" 
+          leftAnimClass="animate-float-icon-1"
+          rightAnimClass="animate-float-icon-4"
+          leftDelay="0.2s"
+          rightDelay="1.2s"
+          leftRotate="-8deg"
+          rightRotate="20deg"
+        />
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-50/90 via-purple-50/70 to-pink-50/90 text-slate-800 shadow-xl border-2 border-indigo-100/90">
+          <div 
+            className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 p-6 sm:p-10 lg:p-12 border-2 rounded-3xl" 
+            style={{ backgroundColor: '#fefe97', borderColor: '#3b0202', borderStyle: 'solid' }}
+          >
           
           <div className="lg:col-span-7 space-y-6">
             
+            {/* English Welcome Button / Badge with Sparky Avatar */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onOpenInstructions}
+                className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border border-white/30"
+              >
+                <SparkyAvatar size="xs" mood="waving" className="scale-110" />
+                <span>👋 Welcome! Sparky&apos;s Learning Guide</span>
+                <span className="text-xs bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Guide</span>
+              </button>
+            </div>
+
             {/* 3D Animated Title without "in English" */}
             <div className="py-2" style={{ fontSize: '22px' }}>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight animate-float-3d select-none">
-                <span className="text-3d-title" style={{ fontSize: '45px', paddingLeft: '0px' }}>Master the </span>
-                <span className="text-3d-highlight" style={{ fontSize: '45px' }}>First Conditional</span>
+                <span className="text-3d-title" style={{ fontSize: '50px', paddingLeft: '0px' }}>Master the </span>
+                <span className="text-3d-highlight" style={{ fontSize: '50px', textAlign: 'center' }}>First Conditional</span>
               </h1>
             </div>
             
@@ -57,19 +114,38 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
+              {/* Button 1: Student Manual (manual del estudiante) */}
               <button
-                onClick={onStartGame}
-                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-extrabold shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
+                type="button"
+                onClick={handleOpenManual}
+                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white text-sm font-extrabold shadow-lg shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
+                title="Student Manual"
               >
-                <span>Play 10-Habits Matching Game</span>
-                <ArrowRight className="w-4 h-4" />
+                <BookOpen className="w-4 h-4" />
+                <span>Student Manual</span>
               </button>
 
+              {/* Button 2: Start the Learning Mission (Empieza la misión de aprender) */}
               <button
-                onClick={onGoToOrderLab}
-                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 text-white text-sm font-extrabold shadow-lg shadow-fuchsia-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
+                type="button"
+                onClick={handleStartMission}
+                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:from-purple-700 hover:to-fuchsia-700 text-white text-sm font-extrabold shadow-lg shadow-purple-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
+                title="Start the Learning Mission"
               >
-                <span>Explore Comma Rule Lab</span>
+                <Rocket className="w-4 h-4" />
+                <span>Start the Learning Mission</span>
+              </button>
+
+              {/* Button 3: Jump Directly to the Game (Salta directamente al juego) */}
+              <button
+                type="button"
+                onClick={handleJumpToGame}
+                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-extrabold shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
+                title="Jump Directly to the Game"
+              >
+                <Gamepad2 className="w-4 h-4" />
+                <span>Jump Directly to the Game</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 
@@ -85,7 +161,7 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
               </div>
               <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 font-semibold shadow-2xs">
                 <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shrink-0"></div>
-                <span style={{ fontSize: '14px' }}><strong>Modals:</strong> can, must, may, might</span>
+                <span style={{ fontSize: '14px' }}><strong>Modals:</strong> can, must, should</span>
               </div>
             </div>
           </div>
@@ -108,15 +184,29 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
 
         </div>
       </section>
+    </div>
 
       {/* SECTION 1: USES OF THE FIRST CONDITIONAL (Cards in light sky, mint, and purple) */}
-      <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#f1e1e1' }}>
+      <div className="relative">
+        <BoxFlankIcons 
+          leftIcon="lightbulb" 
+          rightIcon="clock" 
+          leftTop="26%" 
+          rightTop="58%" 
+          leftAnimClass="animate-float-icon-6" 
+          rightAnimClass="animate-float-icon-3" 
+          leftDelay="0.8s" 
+          rightDelay="1.8s" 
+          leftRotate="-12deg" 
+          rightRotate="10deg" 
+        />
+        <section id="uses-section" className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6 scroll-mt-24 sm:scroll-mt-28" style={{ backgroundColor: '#f1e1e1' }}>
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
           <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
             <Lightbulb className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold italic" style={{ color: '#760040', fontStyle: 'italic', fontSize: '28px' }}>1. Uses of the First Conditional</h2>
+            <h2 className="text-xl sm:text-2xl font-bold italic animate-h2-motion" style={{ color: '#760040', fontStyle: 'italic', fontSize: '28px' }}>1. Uses of the First Conditional</h2>
             <p className="text-xs sm:text-sm text-slate-500">When and why do we use this conditional structure?</p>
           </div>
         </div>
@@ -156,15 +246,29 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
           </div>
         </div>
       </section>
+    </div>
 
       {/* SECTION 2: THE ANATOMY (Light theme with pastel green, blue, pink, and violet cards) */}
-      <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#8cf28a' }}>
+      <div className="relative">
+        <BoxFlankIcons 
+          leftIcon="puzzle" 
+          rightIcon="speechBubble" 
+          leftTop="28%" 
+          rightTop="64%" 
+          leftAnimClass="animate-float-icon-2" 
+          rightAnimClass="animate-float-icon-5" 
+          leftDelay="1.4s" 
+          rightDelay="0.6s" 
+          leftRotate="14deg" 
+          rightRotate="-10deg" 
+        />
+        <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#8cf28a' }}>
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
           <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
             <Layers className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 italic" style={{ color: '#00165f', fontStyle: 'italic', fontSize: '28px' }}>2. The Two Parts: If-Clause vs. Main Clause</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 italic animate-h2-motion" style={{ color: '#00165f', fontStyle: 'italic', fontSize: '28px' }}>2. The Two Parts: If-Clause vs. Main Clause</h2>
             <p className="text-xs sm:text-sm text-slate-500">Every First Conditional sentence consists of two interdependent clauses</p>
           </div>
         </div>
@@ -223,22 +327,36 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
                 The Main Clause (The Result)
               </h4>
               <p className="text-slate-700 leading-relaxed">
-                Describes the probable outcome or consequence if that condition is satisfied. Uses <strong>will + base form</strong> (or a modal such as can, must, may, might).
+                Describes the probable outcome or consequence if that condition is satisfied. Uses <strong>will + base form</strong> (or a modal such as can, must, should).
               </p>
             </div>
           </div>
         </div>
       </section>
+    </div>
 
       {/* SECTION 3: STRUCTURES (Vibrant type tabs, larger sound buttons, light pastel example cards) */}
-      <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#b4ffff' }}>
+      <div className="relative">
+        <BoxFlankIcons 
+          leftIcon="abc" 
+          rightIcon="pencil" 
+          leftTop="24%" 
+          rightTop="56%" 
+          leftAnimClass="animate-float-icon-4" 
+          rightAnimClass="animate-float-icon-1" 
+          leftDelay="1.0s" 
+          rightDelay="2.1s" 
+          leftRotate="8deg" 
+          rightRotate="18deg" 
+        />
+        <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#b4ffff' }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
               <BookMarked className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold italic" style={{ color: '#5a0067', fontStyle: 'italic', fontSize: '27px' }}>3. Sentence Structures: Affirmative, Negative & Interrogative</h2>
+              <h2 className="text-xl sm:text-2xl font-bold italic animate-h2-motion" style={{ color: '#5a0067', fontStyle: 'italic', fontSize: '27px' }}>3. Sentence Structures: Affirmative, Negative & Interrogative</h2>
               <p className="text-xs sm:text-sm text-slate-500">Formulas and 2 real study habit examples for each type</p>
             </div>
           </div>
@@ -374,23 +492,37 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
           </div>
         </div>
       </section>
+    </div>
 
       {/* SECTION 4: EXCEPTIONS - MODAL VERBS IN MAIN CLAUSE (Colorful modal buttons & light detail card) */}
-      <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#f5c0ff' }}>
+      <div className="relative">
+        <BoxFlankIcons 
+          leftIcon="headphones" 
+          rightIcon="notebook" 
+          leftTop="26%" 
+          rightTop="65%" 
+          leftAnimClass="animate-float-icon-3" 
+          rightAnimClass="animate-float-icon-6" 
+          leftDelay="0.5s" 
+          rightDelay="1.6s" 
+          leftRotate="12deg" 
+          rightRotate="-14deg" 
+        />
+        <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#f5c0ff' }}>
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
           <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 italic" style={{ color: '#001963', fontStyle: 'italic', fontSize: '27px' }}>4. Exceptions: Using Other Modals Instead of "Will"</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 italic animate-h2-motion" style={{ color: '#001963', fontStyle: 'italic', fontSize: '27px' }}>4. Exceptions: Using Other Modals Instead of "Will"</h2>
             <p className="text-xs sm:text-sm text-slate-500" style={{ color: '#0b2143' }}>
-              In the main clause, you can replace <strong>"will"</strong> with modal verbs like <strong>“can”, “must”, “may”</strong> and <strong>“might”</strong> to express ability, obligation, or degrees of possibility.
+              In the main clause, you can replace <strong>"will"</strong> with modal verbs like <strong>“can”, “must”,</strong> and <strong>“should”</strong> to express ability, obligation, or suggestions and recommendations.
             </p>
           </div>
         </div>
 
-        {/* Modal Buttons in 4 distinct vibrant colors */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Modal Buttons in 3 distinct vibrant colors */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {MODAL_EXCEPTIONS.map((item) => {
             const isActive = activeModal === item.modal;
             const colorStyles: Record<string, { active: string; inactive: string }> = {
@@ -402,13 +534,9 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
                 active: 'bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/30 scale-[1.02]',
                 inactive: 'bg-rose-50 text-rose-900 hover:bg-rose-100 border-rose-200'
               },
-              may: {
-                active: 'bg-sky-500 text-white border-sky-600 shadow-md shadow-sky-500/30 scale-[1.02]',
-                inactive: 'bg-sky-50 text-sky-900 hover:bg-sky-100 border-sky-200'
-              },
-              might: {
-                active: 'bg-purple-600 text-white border-purple-700 shadow-md shadow-purple-500/30 scale-[1.02]',
-                inactive: 'bg-purple-50 text-purple-900 hover:bg-purple-100 border-purple-200'
+              should: {
+                active: 'bg-indigo-600 text-white border-indigo-700 shadow-md shadow-indigo-500/30 scale-[1.02]',
+                inactive: 'bg-indigo-50 text-indigo-900 hover:bg-indigo-100 border-indigo-200'
               }
             };
 
@@ -486,15 +614,29 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
           </div>
         </div>
       </section>
+    </div>
 
       {/* SECTION 5: THE 5 GOLDEN RULES (Cards in light blue, green, purple, pink, and yellow) */}
-      <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#a2aaf4' }}>
+      <div className="relative">
+        <BoxFlankIcons 
+          leftIcon="star" 
+          rightIcon="book" 
+          leftTop="22%" 
+          rightTop="60%" 
+          leftAnimClass="animate-float-icon-5" 
+          rightAnimClass="animate-float-icon-2" 
+          leftDelay="1.5s" 
+          rightDelay="0.9s" 
+          leftRotate="15deg" 
+          rightRotate="-10deg" 
+        />
+        <section className="rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6" style={{ backgroundColor: '#a2aaf4' }}>
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
           <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
             <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 italic" style={{ color: '#143300', fontStyle: 'italic', fontSize: '28px' }}>5. Golden Rules of the First Conditional</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 italic animate-h2-motion" style={{ color: '#143300', fontStyle: 'italic', fontSize: '28px' }}>5. Golden Rules of the First Conditional</h2>
             <p className="text-xs sm:text-sm text-slate-500" style={{ color: '#5f2059', fontWeight: 'bold' }}>Essential grammatical principles every English learner must memorize</p>
           </div>
         </div>
@@ -578,42 +720,59 @@ export const GrammarGuide: React.FC<GrammarGuideProps> = ({ onStartGame, onGoToO
           })}
         </div>
       </section>
+    </div>
 
       {/* SECTION 7: Interactive Habit Practice Graphic Banner in LIGHT theme with colorful buttons */}
-      <section className="border-2 border-teal-200/90 rounded-3xl p-6 sm:p-10 text-slate-900 overflow-hidden relative shadow-md" style={{ backgroundColor: '#00aaab' }}>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-7 space-y-4" style={{ fontFamily: 'system-ui', fontStyle: 'normal', fontWeight: 'bold' }}>
-            <span className="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-800 border border-teal-300">
-              Ready for Interactive Practice?
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900" style={{ borderColor: '#992222' }}>
-              Test Yourself with the 10 Study Habits Matching Game!
-            </h3>
-            <p className="text-sm text-slate-600 leading-relaxed font-medium">
-              Match 10 real student habits with their future English fluency outcomes. Strengthen your recognition of conditions and consequences while picking up actionable study techniques!
-            </p>
-            <div className="pt-2">
-              <button
-                onClick={onStartGame}
-                className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-emerald-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 text-white font-extrabold text-sm shadow-lg shadow-teal-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
-              >
-                <span>Launch Matching Challenge Now</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+      <div className="relative">
+        <BoxFlankIcons 
+          leftIcon="puzzle" 
+          rightIcon="rocket" 
+          leftTop="25%" 
+          rightTop="55%" 
+          leftAnimClass="animate-float-icon-1" 
+          rightAnimClass="animate-float-icon-4" 
+          leftDelay="1.1s" 
+          rightDelay="0.3s" 
+          leftRotate="-12deg" 
+          rightRotate="22deg" 
+        />
+        <section className="border-2 border-teal-200/90 rounded-3xl p-6 sm:p-10 text-slate-900 overflow-hidden relative shadow-md" style={{ backgroundColor: '#00aaab' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-7 space-y-4" style={{ fontFamily: 'system-ui', fontStyle: 'normal', fontWeight: 'bold' }}>
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-800 border border-teal-300">
+                Ready for Interactive Practice?
+              </span>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight animate-3d-h3 leading-tight block py-1" style={{ borderColor: '#992222' }}>
+                <span className="text-3d-test-yourself block drop-shadow-sm">
+                  Test Yourself with the 10 Study Habits Matching Game!
+                </span>
+              </h3>
+              <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                Match 10 real student habits with their future English fluency outcomes. Strengthen your recognition of conditions and consequences while picking up actionable study techniques!
+              </p>
+              <div className="pt-2">
+                <button
+                  onClick={onStartGame}
+                  className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 via-emerald-500 to-indigo-600 hover:from-teal-600 hover:to-indigo-700 text-white font-extrabold text-sm shadow-lg shadow-teal-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
+                >
+                  <span>Launch Matching Challenge Now</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="lg:col-span-5">
-            <div className="rounded-2xl overflow-hidden border-2 border-teal-300/60 shadow-xl">
-              <img 
-                src={practiceImg} 
-                alt="Student practicing spoken English" 
-                className="w-full h-48 sm:h-56 object-cover object-center"
-              />
+            <div className="lg:col-span-5">
+              <div className="rounded-2xl overflow-hidden border-2 border-teal-300/60 shadow-xl">
+                <img 
+                  src={practiceImg} 
+                  alt="Student practicing spoken English" 
+                  className="w-full h-48 sm:h-56 object-cover object-center"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
     </div>
   );

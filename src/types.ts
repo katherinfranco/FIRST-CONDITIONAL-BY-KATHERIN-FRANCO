@@ -34,7 +34,7 @@ export interface GrammarStructure {
 }
 
 export interface ModalException {
-  modal: 'can' | 'must' | 'may' | 'might';
+  modal: 'can' | 'must' | 'should';
   meaning: string;
   nuance: string;
   formula: string;
@@ -61,4 +61,29 @@ export interface MatchFeedback {
   title: string;
   message: string;
   sentence?: SentenceHabit;
+}
+
+export interface MatchedPairRecord {
+  sentenceId: number;
+  conditionText: string;
+  resultText: string;
+  fullSentence: string;
+  habitTitle: string;
+  explanation: string;
+  conditionVerb: string;
+  resultVerb: string;
+}
+
+export interface IncorrectAttemptRecord {
+  id: string;
+  conditionText: string;
+  chosenResultText: string;
+  targetSentenceId: number;
+  targetHabitTitle: string;
+  correctResultText: string;
+  correctFullSentence: string;
+  actualSentenceForResultId: number;
+  actualConditionForResultText: string;
+  actualFullSentenceForResult: string;
+  timestamp: number;
 }

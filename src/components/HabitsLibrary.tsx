@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { STUDY_HABIT_SENTENCES } from '../data/firstConditionalData';
 import { speakEnglish } from '../utils/audio';
+import { SparkyAvatar } from './SparkyAvatar';
 
 export const HabitsLibrary: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -43,7 +44,7 @@ export const HabitsLibrary: React.FC = () => {
               <BookmarkCheck className="w-3.5 h-3.5 text-teal-600" />
               <span>Complete Habits Reference</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight italic" style={{ color: '#600505', fontStyle: 'italic' }}>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight italic animate-h2-motion" style={{ color: '#600505', fontStyle: 'italic' }}>
               10 Effective English Learner Habits
             </h2>
             <p className="text-xs sm:text-sm leading-relaxed" style={{ color: '#0059a7', fontWeight: 'bold' }}>
@@ -63,6 +64,22 @@ export const HabitsLibrary: React.FC = () => {
               style={{ backgroundColor: '#a8d9fe', color: '#0b0c0d', fontWeight: 'normal' }}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Sparky Guide Banner */}
+      <div className="flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-100 border-2 border-amber-300 text-slate-800 shadow-sm">
+        <SparkyAvatar size="sm" mood="happy" className="shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black uppercase tracking-wider text-amber-900 bg-amber-200/80 px-2.5 py-0.5 rounded-full border border-amber-300">
+              Habits Guide with Sparky 🦊
+            </span>
+            <span className="text-xs font-bold text-slate-600">Evidence-Based Learning</span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
+            These 10 habits will transform your English! Each card contains an authentic First Conditional sentence, its grammatical breakdown, and the cognitive reasoning behind it. Click the audio button 🔊 to practice pronunciation, and use the swap button to practice reversing clause order.
+          </p>
         </div>
       </div>
 
@@ -143,16 +160,16 @@ export const HabitsLibrary: React.FC = () => {
                     </span>
                     <span className="text-violet-600 font-extrabold mx-0.5 text-lg">,</span>
                     <span className="text-indigo-700 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-200 ml-1">
-                      {habit.resultClause}.
+                      {habit.resultClause.endsWith('?') ? habit.resultClause : `${habit.resultClause}.`}
                     </span>
                   </p>
                 ) : (
                   <p className="text-sm sm:text-base font-semibold leading-relaxed text-slate-900">
                     <span className="text-indigo-700 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-200 capitalize">
-                      {habit.resultClause.charAt(0).toUpperCase() + habit.resultClause.slice(1)}
+                      {habit.resultClause.charAt(0).toUpperCase() + habit.resultClause.slice(1).replace(/\?$/, '')}
                     </span>
                     <span className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200 ml-1">
-                      {habit.conditionClause.toLowerCase()}.
+                      {habit.conditionClause.toLowerCase()}{habit.resultClause.endsWith('?') ? '?' : '.'}
                     </span>
                   </p>
                 )}

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { STUDY_HABIT_SENTENCES } from '../data/firstConditionalData';
 import { sound, speakEnglish } from '../utils/audio';
+import { SparkyAvatar } from './SparkyAvatar';
 
 export const OrderInverterLab: React.FC = () => {
   const [selectedSentenceId, setSelectedSentenceId] = useState<number>(1);
@@ -94,11 +95,27 @@ export const OrderInverterLab: React.FC = () => {
             <ArrowLeftRight className="w-3.5 h-3.5 text-violet-600" />
             <span>Interactive Punctuation Lab</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight italic" style={{ fontStyle: 'italic' }}>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight italic animate-h2-motion" style={{ color: '#760963', fontStyle: 'italic' }}>
             Clause Order & The Comma Rule
           </h2>
           <p className="leading-relaxed" style={{ fontSize: '15px', color: '#2e025b' }}>
             In English, you can switch the position of the clauses freely without changing the underlying meaning. However, <strong>the punctuation rule changes strictly</strong> depending on which clause begins the sentence!
+          </p>
+        </div>
+      </div>
+
+      {/* Sparky Mascot Guide Card */}
+      <div className="flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100 border-2 border-orange-300 text-slate-800 shadow-sm">
+        <SparkyAvatar size="sm" mood="thinking" className="shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black uppercase tracking-wider text-orange-800 bg-orange-200/70 px-2.5 py-0.5 rounded-full border border-orange-300">
+              Sparky's Tip 🦊
+            </span>
+            <span className="text-xs font-bold text-slate-500">The Comma Rule</span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
+            Pay close attention to this golden rule! <strong>If you begin the sentence with &quot;If...&quot;, you MUST always put a comma (,)</strong> before the second clause. But if you place the result clause first (e.g., <em>&quot;You will pass if you study&quot;</em>), <strong>the comma disappears completely!</strong> Click the <em>&quot;Invert Clause Order&quot;</em> button below to see it live.
           </p>
         </div>
       </div>
@@ -177,14 +194,14 @@ export const OrderInverterLab: React.FC = () => {
                 </span>
 
                 <span className="px-4 py-3 rounded-xl bg-sky-50 border-2 border-sky-400 text-sky-950 font-bold text-base sm:text-lg shadow-sm">
-                  {activeSentence.resultClause}.
+                  {activeSentence.resultClause.endsWith('?') ? activeSentence.resultClause : `${activeSentence.resultClause}.`}
                 </span>
               </>
             ) : (
               // Inverted Order: Main Clause + If-Clause (No Comma)
               <>
                 <span className="px-4 py-3 rounded-xl bg-sky-50 border-2 border-sky-400 text-sky-950 font-bold text-base sm:text-lg shadow-sm capitalize">
-                  {activeSentence.resultClause.charAt(0).toUpperCase() + activeSentence.resultClause.slice(1)}
+                  {activeSentence.resultClause.charAt(0).toUpperCase() + activeSentence.resultClause.slice(1).replace(/\?$/, '')}
                 </span>
 
                 <span className="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-mono font-bold line-through decoration-rose-500 decoration-2">
@@ -192,7 +209,7 @@ export const OrderInverterLab: React.FC = () => {
                 </span>
 
                 <span className="px-4 py-3 rounded-xl bg-emerald-50 border-2 border-emerald-400 text-emerald-950 font-bold text-base sm:text-lg shadow-sm">
-                  {activeSentence.conditionClause.toLowerCase()}.
+                  {activeSentence.conditionClause.toLowerCase()}{activeSentence.resultClause.endsWith('?') ? '?' : '.'}
                 </span>
               </>
             )}

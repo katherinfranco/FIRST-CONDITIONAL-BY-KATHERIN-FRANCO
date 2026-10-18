@@ -130,3 +130,37 @@ export function speakEnglish(text: string) {
     // Graceful fallback
   }
 }
+
+export function speakMascot(
+  text: string, 
+  lang: 'es-ES' | 'en-US' = 'es-ES',
+  onStart?: () => void,
+  onEnd?: () => void
+) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.98;
+    utterance.pitch = 1.15; // Cheerful friendly mascot pitch
+    if (onStart) utterance.onstart = onStart;
+    if (onEnd) {
+      utterance.onend = onEnd;
+      utterance.onerror = onEnd;
+    }
+    window.speechSynthesis.speak(utterance);
+  } catch {
+    if (onEnd) onEnd();
+  }
+}
+
+export function stopSpeaking() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch {
+      // Graceful fallback
+    }
+  }
+}

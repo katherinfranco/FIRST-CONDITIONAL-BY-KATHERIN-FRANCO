@@ -14,11 +14,15 @@ import {
   Layers, 
   Shuffle, 
   HelpCircle,
-  Award
+  Award,
+  Lock
 } from 'lucide-react';
 import { STUDY_HABIT_SENTENCES } from '../data/firstConditionalData';
-import { SentenceHabit, GameCard } from '../types';
+import { SentenceHabit, GameCard, MatchedPairRecord, IncorrectAttemptRecord } from '../types';
 import { sound, speakEnglish } from '../utils/audio';
+import { SparkyAvatar } from './SparkyAvatar';
+import { MatchingResultsModal } from './MatchingResultsModal';
+import habitMatchingImg from '../assets/images/habit_matching_game_1791616993577.jpg';
 
 export const MatchingGame: React.FC = () => {
   const [conditions, setConditions] = useState<GameCard[]>([]);
@@ -31,6 +35,14 @@ export const MatchingGame: React.FC = () => {
   const [highestStreak, setHighestStreak] = useState<number>(0);
   const [mistakes, setMistakes] = useState<number>(0);
   const [matchesCount, setMatchesCount] = useState<number>(0);
+
+  // Student attempts & records for results review
+  const [correctMatches, setCorrectMatches] = useState<MatchedPairRecord[]>([]);
+  const [incorrectAttempts, setIncorrectAttempts] = useState<IncorrectAttemptRecord[]>([]);
+
+  // Results & Teacher modal
+  const [isResultsModalOpen, setIsResultsModalOpen] = useState<boolean>(false);
+  const [resultsModalTab, setResultsModalTab] = useState<'student' | 'teacher'>('student');
 
   const [seconds, setSeconds] = useState<number>(0);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(true);
@@ -51,25 +63,37 @@ export const MatchingGame: React.FC = () => {
 
   // Initialize and shuffle cards
   const initGame = useCallback(() => {
-    // Left column: Conditions
-    const condCards: GameCard[] = STUDY_HABIT_SENTENCES.map((s): GameCard => ({
-      id: `cond-${s.id}`,
-      sentenceId: s.id,
-      type: 'condition' as const,
-      text: s.conditionClause,
-      isMatched: false,
-      isSelected: false,
-    })).sort(() => Math.random() - 0.5);
+    // Left column: Conditions (First Part) - with comma
+    const condCards: GameCard[] = STUDY_HABIT_SENTENCES.map((s): GameCard => {
+      const trimmed = s.conditionClause.trim();
+      const textWithComma = trimmed.endsWith(',') ? trimmed : `${trimmed},`;
+      return {
+        id: `cond-${s.id}`,
+        sentenceId: s.id,
+        type: 'condition' as const,
+        text: textWithComma,
+        isMatched: false,
+        isSelected: false,
+      };
+    }).sort(() => Math.random() - 0.5);
 
-    // Right column: Results
-    const resCards: GameCard[] = STUDY_HABIT_SENTENCES.map((s): GameCard => ({
-      id: `res-${s.id}`,
-      sentenceId: s.id,
-      type: 'result' as const,
-      text: s.resultClause,
-      isMatched: false,
-      isSelected: false,
-    })).sort(() => Math.random() - 0.5);
+    // Right column: Results (Second Part) - with period where appropriate (preserves '?' for questions)
+    const resCards: GameCard[] = STUDY_HABIT_SENTENCES.map((s): GameCard => {
+      const trimmed = s.resultClause.trim();
+      const textWithPeriod = trimmed.endsWith('?')
+        ? trimmed
+        : trimmed.endsWith('.')
+        ? trimmed
+        : `${trimmed}.`;
+      return {
+        id: `res-${s.id}`,
+        sentenceId: s.id,
+        type: 'result' as const,
+        text: textWithPeriod,
+        isMatched: false,
+        isSelected: false,
+      };
+    }).sort(() => Math.random() - 0.5);
 
     setConditions(condCards);
     setResults(resCards);
@@ -83,6 +107,10 @@ export const MatchingGame: React.FC = () => {
     setSeconds(0);
     setIsTimerRunning(true);
     setIsGameOver(false);
+    setCorrectMatches([]);
+    setIncorrectAttempts([]);
+    setIsResultsModalOpen(false);
+    setResultsModalTab('student');
     setFeedback({
       type: null,
       message: 'Select an If-Clause on the left, then select its matching Result on the right!'
@@ -142,6 +170,12 @@ export const MatchingGame: React.FC = () => {
       } catch {
         // Fallback
       }
+
+      // Automatically show results modal for the student with review of correct & incorrect pairs
+      setTimeout(() => {
+        setResultsModalTab('student');
+        setIsResultsModalOpen(true);
+      }, 700);
     }
   }, [matchesCount, isGameOver]);
 
@@ -188,6 +222,19 @@ export const MatchingGame: React.FC = () => {
       setScore((prev) => prev + earnedPoints);
       setMatchesCount((prev) => prev + 1);
 
+      // Record student's correctly matched pair
+      const matchedRecord: MatchedPairRecord = {
+        sentenceId: sentenceData.id,
+        conditionText: condCard.text,
+        resultText: resCard.text,
+        fullSentence: sentenceData.fullSentence,
+        habitTitle: sentenceData.habitTitle,
+        explanation: sentenceData.explanation,
+        conditionVerb: sentenceData.conditionVerb,
+        resultVerb: sentenceData.resultVerb,
+      };
+      setCorrectMatches((prev) => [...prev, matchedRecord]);
+
       // Mark cards as matched
       setConditions((prev) =>
         prev.map((c) => (c.id === condCard.id ? { ...c, isMatched: true } : c))
@@ -210,6 +257,30 @@ export const MatchingGame: React.FC = () => {
       setStreak(0);
       setMistakes((m) => m + 1);
       setScore((s) => Math.max(0, s - 15));
+
+      // Record student's mistaken pair and its correct combination
+      const actualSentenceForResult = STUDY_HABIT_SENTENCES.find((s) => s.id === resCard.sentenceId)!;
+      const trimmedTargetResult = sentenceData.resultClause.trim();
+      const formattedTargetResult = trimmedTargetResult.endsWith('?')
+        ? trimmedTargetResult
+        : trimmedTargetResult.endsWith('.')
+        ? trimmedTargetResult
+        : `${trimmedTargetResult}.`;
+
+      const mistakeRecord: IncorrectAttemptRecord = {
+        id: `mistake-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        conditionText: condCard.text,
+        chosenResultText: resCard.text,
+        targetSentenceId: sentenceData.id,
+        targetHabitTitle: sentenceData.habitTitle,
+        correctResultText: formattedTargetResult,
+        correctFullSentence: sentenceData.fullSentence,
+        actualSentenceForResultId: actualSentenceForResult.id,
+        actualConditionForResultText: actualSentenceForResult.conditionClause,
+        actualFullSentenceForResult: actualSentenceForResult.fullSentence,
+        timestamp: Date.now(),
+      };
+      setIncorrectAttempts((prev) => [...prev, mistakeRecord]);
 
       // Trigger shake animation
       setShakingConditionId(condCard.id);
@@ -256,19 +327,34 @@ export const MatchingGame: React.FC = () => {
       <div className="rounded-3xl p-5 sm:p-7 border border-slate-200/80 shadow-xs" style={{ backgroundColor: '#ffb3b3' }}>
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           
-          <div>
-            <div className="flex items-center gap-2 mb-1" style={{ fontSize: '20px' }}>
-              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800">
-                10 Habit Pairs Challenge
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
+            <div className="relative shrink-0 group">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-white/95 shadow-md ring-2 ring-emerald-600/40 bg-white">
+                <img 
+                  src={habitMatchingImg} 
+                  alt="Study habits illustration: Daily schedule, vocabulary practice and English journaling" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <span className="absolute -bottom-1 -right-1 bg-emerald-600 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full shadow-xs border border-white tracking-wider">
+                HABITS
               </span>
-              <span className="text-slate-500" style={{ fontSize: '18px', fontWeight: 'bold' }}>First Conditional Practice</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight italic" style={{ fontStyle: 'italic' }}>
-              Habits Matching Game
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl">
-              Match each <strong className="text-emerald-700">If-clause (Condition)</strong> with its logical <strong className="text-indigo-700">Main clause (Consequence)</strong>.
-            </p>
+
+            <div>
+              <div className="flex items-center gap-2 mb-1" style={{ fontSize: '20px' }}>
+                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800">
+                  10 Habit Pairs Challenge
+                </span>
+                <span className="text-slate-500" style={{ fontSize: '18px', fontWeight: 'bold' }}>First Conditional Practice</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight italic animate-h2-motion" style={{ fontStyle: 'italic', fontSize: '38px', color: '#136500' }}>
+                Habits Matching Game
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl" style={{ fontSize: '17px' }}>
+                Match each <strong className="text-emerald-700">If-clause (Condition)</strong> with its logical <strong className="text-indigo-700">Main clause (Consequence)</strong>.
+              </p>
+            </div>
           </div>
 
           {/* Stats Badges */}
@@ -313,6 +399,18 @@ export const MatchingGame: React.FC = () => {
             {/* Action Buttons in Bright Colors */}
             <div className="flex items-center gap-2 ml-auto sm:ml-0">
               <button
+                onClick={() => {
+                  setResultsModalTab('teacher');
+                  setIsResultsModalOpen(true);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black transition-all shadow-md shadow-amber-400/25 active:scale-95 cursor-pointer flex items-center gap-1.5"
+                title="Acceso exclusivo para el docente: Ver clave de respuestas"
+              >
+                <Lock className="w-3.5 h-3.5 text-slate-950" />
+                <span>Clave Docente</span>
+              </button>
+
+              <button
                 onClick={handleGiveHint}
                 className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-bold transition-all shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer flex items-center gap-1.5"
                 title="Get a hint (-10 points)"
@@ -341,6 +439,22 @@ export const MatchingGame: React.FC = () => {
             className="bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${(matchesCount / 10) * 100}%` }}
           ></div>
+        </div>
+      </div>
+
+      {/* Sparky Cheer & Challenge Card */}
+      <div className="flex items-start gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100 border-2 border-emerald-300 text-slate-800 shadow-sm">
+        <SparkyAvatar size="sm" mood="excited" className="shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-900 bg-emerald-200/80 px-2.5 py-0.5 rounded-full border border-emerald-300">
+              Sparky's Challenge 🦊
+            </span>
+            <span className="text-xs font-bold text-slate-600">Connect All 10 Pairs!</span>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
+            You've got this! Click an <strong>&quot;If-Clause&quot;</strong> condition on the left column, then find its logical <strong>&quot;will&quot;</strong> result on the right column. Don't worry if you miss a match—mistakes help you learn! Click the <em>Hint</em> button if you need a clue.
+          </p>
         </div>
       </div>
 
@@ -520,81 +634,74 @@ export const MatchingGame: React.FC = () => {
 
       </div>
 
-      {/* GAME VICTORY MODAL */}
+      {/* Persistent Completed Game Bottom Banner */}
       {isGameOver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden p-6 sm:p-8 text-center space-y-6">
-            
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-amber-500/30 animate-bounce">
-              <Award className="w-10 h-10" />
+        <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-700 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl border-2 border-emerald-400/40 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex items-center gap-3.5 text-center md:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
+              <Trophy className="w-7 h-7 text-amber-300 animate-bounce" />
             </div>
-
             <div>
-              <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-                All 10 Habit Pairs Mastered!
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
-                Congratulations, Conditional Master!
-              </h3>
-              <p className="text-sm text-slate-600 mt-1">
-                You successfully connected all 10 First Conditional sentences and their effective study habits.
-              </p>
-            </div>
-
-            {/* Final Game Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-              <div className="p-2">
-                <div className="text-xs text-slate-500 uppercase font-semibold">Final Score</div>
-                <div className="text-xl font-black text-indigo-700 font-mono">{score}</div>
+              <div className="flex items-center gap-2 justify-center md:justify-start">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-white/20 text-emerald-100">
+                  ¡Reto Completado!
+                </span>
+                <span className="text-xs text-emerald-100 font-semibold">10 de 10 parejas</span>
               </div>
-              <div className="p-2">
-                <div className="text-xs text-slate-500 uppercase font-semibold">Total Time</div>
-                <div className="text-xl font-black text-slate-800 font-mono">{formattedTime}</div>
-              </div>
-              <div className="p-2">
-                <div className="text-xs text-slate-500 uppercase font-semibold">Max Streak</div>
-                <div className="text-xl font-black text-amber-600 font-mono">{highestStreak}x</div>
-              </div>
-              <div className="p-2">
-                <div className="text-xs text-slate-500 uppercase font-semibold">Accuracy</div>
-                <div className="text-xl font-black text-emerald-600 font-mono">
-                  {Math.round((10 / (10 + mistakes)) * 100)}%
-                </div>
+              <div className="text-base sm:text-lg font-black mt-0.5">
+                ¡Felicidades! Has completado todas las oraciones del Primer Condicional
               </div>
             </div>
+          </div>
 
-            {/* Study Habit Key Lesson */}
-            <div className="bg-indigo-50/70 border border-indigo-200/70 rounded-2xl p-4 text-xs text-indigo-950 text-left space-y-1">
-              <div className="font-bold text-indigo-900 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                <span>Effective English Habit Takeaway:</span>
-              </div>
-              <p className="text-slate-700 leading-relaxed">
-                Consistency, real-world practice, and viewing mistakes as learning opportunities will accelerate your English fluency faster than pure theoretical cramming!
-              </p>
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            <button
+              onClick={() => {
+                setResultsModalTab('student');
+                setIsResultsModalOpen(true);
+              }}
+              className="px-4 py-2.5 rounded-xl bg-white text-emerald-950 font-black text-xs sm:text-sm hover:bg-emerald-50 transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Ver Parejas y Correcciones</span>
+            </button>
 
-            {/* Modal Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                onClick={initGame}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Play Again (Fresh Shuffle)</span>
-              </button>
+            <button
+              onClick={() => {
+                setResultsModalTab('teacher');
+                setIsResultsModalOpen(true);
+              }}
+              className="px-4 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-black text-xs sm:text-sm hover:bg-amber-300 transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+            >
+              <Lock className="w-4 h-4 text-slate-950" />
+              <span>Clave del Docente</span>
+            </button>
 
-              <button
-                onClick={() => setIsGameOver(false)}
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-all cursor-pointer"
-              >
-                Review Completed Board
-              </button>
-            </div>
-
+            <button
+              onClick={initGame}
+              className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Jugar de Nuevo</span>
+            </button>
           </div>
         </div>
       )}
+
+      {/* COMPREHENSIVE RESULTS & TEACHER KEY MODAL */}
+      <MatchingResultsModal
+        isOpen={isResultsModalOpen}
+        onClose={() => setIsResultsModalOpen(false)}
+        onPlayAgain={initGame}
+        score={score}
+        formattedTime={formattedTime}
+        highestStreak={highestStreak}
+        mistakes={mistakes}
+        correctMatches={correctMatches}
+        incorrectAttempts={incorrectAttempts}
+        allSentences={STUDY_HABIT_SENTENCES}
+        initialTab={resultsModalTab}
+      />
 
     </div>
   );

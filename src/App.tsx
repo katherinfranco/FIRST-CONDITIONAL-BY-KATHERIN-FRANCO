@@ -10,36 +10,69 @@ import { MatchingGame } from './components/MatchingGame';
 import { OrderInverterLab } from './components/OrderInverterLab';
 import { HabitsLibrary } from './components/HabitsLibrary';
 import { InstructionsModal } from './components/InstructionsModal';
+import { MascotCompanion } from './components/MascotCompanion';
+import { FloatingBackgroundIcons } from './components/FloatingBackgroundIcons';
 import { GraduationCap, BookOpen, Gamepad2, ArrowLeftRight, BookmarkCheck, Heart } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('grammar');
   const [isInstructionsOpen, setIsInstructionsOpen] = useState<boolean>(false);
 
+  const goToGrammarGuideUses = () => {
+    if (activeTab !== 'grammar') {
+      setActiveTab('grammar');
+    }
+    // Scroll directly to 1. Uses of the first conditional
+    setTimeout(() => {
+      const el = document.getElementById('uses-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 60);
+  };
+
+  const goToWelcome = () => {
+    if (activeTab !== 'grammar') {
+      setActiveTab('grammar');
+    }
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 40);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden">
       
       {/* Top Navbar */}
       <Navbar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         onOpenInstructions={() => setIsInstructionsOpen(true)}
+        onGoToGrammarGuide={goToGrammarGuideUses}
+        onGoToWelcome={goToWelcome}
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" style={{ backgroundColor: '#dcfbba' }}>
-        {activeTab === 'grammar' && (
-          <GrammarGuide 
-            onStartGame={() => setActiveTab('game')} 
-            onGoToOrderLab={() => setActiveTab('inverter')} 
-          />
-        )}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative" style={{ backgroundColor: '#dcfbba' }}>
+        {/* Animated Floating Background Icons surrounding the explanation and practice boxes */}
+        <FloatingBackgroundIcons activeTab={activeTab} />
 
-        {activeTab === 'game' && <MatchingGame />}
+        <div className="relative z-10">
+          {activeTab === 'grammar' && (
+            <GrammarGuide 
+              onStartGame={() => setActiveTab('game')} 
+              onGoToOrderLab={() => setActiveTab('inverter')} 
+              onOpenInstructions={() => setIsInstructionsOpen(true)}
+              onGoToHabits={() => setActiveTab('habits')}
+            />
+          )}
 
-        {activeTab === 'inverter' && <OrderInverterLab />}
+          {activeTab === 'game' && <MatchingGame />}
 
-        {activeTab === 'habits' && <HabitsLibrary />}
+          {activeTab === 'inverter' && <OrderInverterLab />}
+
+          {activeTab === 'habits' && <HabitsLibrary />}
+        </div>
       </main>
 
       {/* Instructions Modal */}
@@ -47,9 +80,28 @@ export default function App() {
         isOpen={isInstructionsOpen}
         onClose={() => setIsInstructionsOpen(false)}
         onNavigateTab={(tab) => {
-          setActiveTab(tab);
+          if (tab === 'grammar') {
+            goToGrammarGuideUses();
+          } else {
+            setActiveTab(tab);
+          }
           setIsInstructionsOpen(false);
         }}
+      />
+
+      {/* Persistent Mascot Companion: Sparky */}
+      <MascotCompanion
+        activeTab={activeTab}
+        isInstructionsOpen={isInstructionsOpen}
+        onSelectTab={(tab) => {
+          if (tab === 'grammar') {
+            goToGrammarGuideUses();
+          } else {
+            setActiveTab(tab);
+          }
+          setIsInstructionsOpen(false);
+        }}
+        onOpenInstructions={() => setIsInstructionsOpen(true)}
       />
 
       {/* Footer */}
@@ -65,18 +117,24 @@ export default function App() {
 
           <div className="flex items-center gap-6 text-slate-600">
             <button 
-              onClick={() => setActiveTab('grammar')} 
+              onClick={goToWelcome} 
+              className="hover:text-amber-600 transition-colors cursor-pointer text-amber-600 font-extrabold flex items-center gap-1"
+            >
+              <span>Welcome</span>
+            </button>
+            <button 
+              onClick={() => setIsInstructionsOpen(true)} 
+              className="hover:text-indigo-600 transition-colors cursor-pointer text-indigo-600"
+              style={{ fontWeight: 'bold' }}
+            >
+              How to Use
+            </button>
+            <button 
+              onClick={goToGrammarGuideUses} 
               className="hover:text-indigo-600 transition-colors cursor-pointer"
               style={{ fontWeight: 'bold', color: '#2a478c' }}
             >
               Grammar Theory
-            </button>
-            <button 
-              onClick={() => setActiveTab('game')} 
-              className="hover:text-indigo-600 transition-colors cursor-pointer"
-              style={{ fontWeight: 'bold', color: '#014d01' }}
-            >
-              Matching Game
             </button>
             <button 
               onClick={() => setActiveTab('inverter')} 
@@ -93,11 +151,11 @@ export default function App() {
               Habits Library
             </button>
             <button 
-              onClick={() => setIsInstructionsOpen(true)} 
-              className="hover:text-indigo-600 transition-colors cursor-pointer text-indigo-600"
-              style={{ fontWeight: 'bold' }}
+              onClick={() => setActiveTab('game')} 
+              className="hover:text-indigo-600 transition-colors cursor-pointer"
+              style={{ fontWeight: 'bold', color: '#014d01' }}
             >
-              How to Use
+              Matching Game
             </button>
           </div>
         </div>

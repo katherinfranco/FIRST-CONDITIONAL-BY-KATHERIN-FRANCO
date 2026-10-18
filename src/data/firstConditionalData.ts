@@ -5,13 +5,13 @@ import { GrammarStructure, ModalException, SentenceHabit } from '../types';
  * 1. If you organize your study schedule, you will have more time to practice English.
  * 2. If you write a short journal in English, you will improve your ability to express your ideas.
  * 3. If you watch videos in English with subtitles, you will learn how native speakers use everyday expressions.
- * 4. If you make mistakes while speaking English, you will learn from them and improve.
- * 5. If you participate actively in English activities, you will have more opportunities to practice.
- * 6. If you set realistic goals, you will be more motivated to continue learning English.
- * 7. If you use new vocabulary in different sentences, you will understand how to use it correctly.
- * 8. If you ask questions when you do not understand something, you will learn more effectively.
- * 9. If you use English outside the classroom, you will become more comfortable using it in real situations.
- * 10. If you balance grammar practice with speaking and listening activities, you will develop more complete language skills.
+ * 4. If you don't use new vocabulary in different sentences, you won't understand how to use it correctly.
+ * 5. If you read articles in English, you will develop a wider vocabulary.
+ * 6. If you participate actively in English activities, you will have more opportunities to practice.
+ * 7. If you balance grammar practice with speaking and listening activities, will you develop more complete language skills?
+ * 8. If you set realistic goals, you will be more motivated to continue learning English.
+ * 9. If you don't ask questions when you don't understand something, you won't learn as effectively.
+ * 10. If you use English outside the classroom, you will become more comfortable using it in real situations.
  */
 export const STUDY_HABIT_SENTENCES: SentenceHabit[] = [
   {
@@ -52,30 +52,54 @@ export const STUDY_HABIT_SENTENCES: SentenceHabit[] = [
   },
   {
     id: 4,
-    fullSentence: "If you make mistakes while speaking English, you will learn from them and improve.",
-    conditionClause: "If you make mistakes while speaking English",
-    conditionVerb: "make",
-    resultClause: "you will learn from them and improve",
-    resultVerb: "will learn and improve",
-    invertedSentence: "You will learn from them and improve if you make mistakes while speaking English.",
-    habitTitle: "Growth Mindset & Embracing Errors",
-    explanation: "Errors are not failures; they are the fastest feedback mechanism for neural language pathways to self-correct.",
-    category: "mindset"
+    fullSentence: "If you don't use new vocabulary in different sentences, you won't understand how to use it correctly.",
+    conditionClause: "If you don't use new vocabulary in different sentences",
+    conditionVerb: "don't use",
+    resultClause: "you won't understand how to use it correctly",
+    resultVerb: "won't understand",
+    invertedSentence: "You won't understand how to use it correctly if you don't use new vocabulary in different sentences.",
+    habitTitle: "Contextual Vocabulary Practice",
+    explanation: "Practicing vocabulary in varying sentence contexts ensures deep understanding rather than superficial memorization.",
+    category: "vocabulary"
   },
   {
     id: 5,
+    fullSentence: "If you read articles in English, you will develop a wider vocabulary.",
+    conditionClause: "If you read articles in English",
+    conditionVerb: "read",
+    resultClause: "you will develop a wider vocabulary",
+    resultVerb: "will develop",
+    invertedSentence: "You will develop a wider vocabulary if you read articles in English.",
+    habitTitle: "Reading Articles for Vocabulary Growth",
+    explanation: "Reading authentic articles regularly exposes you to diverse sentence structures and expands your active vocabulary.",
+    category: "mindset"
+  },
+  {
+    id: 6,
     fullSentence: "If you participate actively in English activities, you will have more opportunities to practice.",
     conditionClause: "If you participate actively in English activities",
     conditionVerb: "participate",
     resultClause: "you will have more opportunities to practice",
     resultVerb: "will have",
     invertedSentence: "You will have more opportunities to practice if you participate actively in English activities.",
-    habitTitle: "Active Engagement & Club Participation",
-    explanation: "Passive listening only takes you so far; active spoken contribution multiplies your conversational mileage.",
+    habitTitle: "Active Participation in Activities",
+    explanation: "Engaging dynamically in clubs, discussions, and group sessions multiplies your conversational mileage.",
     category: "practice"
   },
   {
-    id: 6,
+    id: 7,
+    fullSentence: "If you balance grammar practice with speaking and listening activities, will you develop more complete language skills?",
+    conditionClause: "If you balance grammar practice with speaking and listening activities",
+    conditionVerb: "balance",
+    resultClause: "will you develop more complete language skills?",
+    resultVerb: "will you develop",
+    invertedSentence: "Will you develop more complete language skills if you balance grammar practice with speaking and listening activities?",
+    habitTitle: "Balanced Four-Skill Practice",
+    explanation: "Balancing analytical grammar review with dynamic oral and listening tasks builds well-rounded communicative fluency.",
+    category: "balance"
+  },
+  {
+    id: 8,
     fullSentence: "If you set realistic goals, you will be more motivated to continue learning English.",
     conditionClause: "If you set realistic goals",
     conditionVerb: "set",
@@ -83,35 +107,23 @@ export const STUDY_HABIT_SENTENCES: SentenceHabit[] = [
     resultVerb: "will be",
     invertedSentence: "You will be more motivated to continue learning English if you set realistic goals.",
     habitTitle: "Realistic Milestone Setting",
-    explanation: "Achievable micro-milestones trigger dopamine rewards and prevent study burnout across months of learning.",
+    explanation: "Achievable micro-milestones trigger steady progress rewards and prevent study burnout across months of learning.",
     category: "goals"
   },
   {
-    id: 7,
-    fullSentence: "If you use new vocabulary in different sentences, you will understand how to use it correctly.",
-    conditionClause: "If you use new vocabulary in different sentences",
-    conditionVerb: "use",
-    resultClause: "you will understand how to use it correctly",
-    resultVerb: "will understand",
-    invertedSentence: "You will understand how to use it correctly if you use new vocabulary in different sentences.",
-    habitTitle: "Contextual Vocabulary Application",
-    explanation: "Memorizing isolated word definitions rarely sticks; manipulating words inside novel contexts cements real mastery.",
-    category: "vocabulary"
-  },
-  {
-    id: 8,
-    fullSentence: "If you ask questions when you do not understand something, you will learn more effectively.",
-    conditionClause: "If you ask questions when you do not understand something",
-    conditionVerb: "ask",
-    resultClause: "you will learn more effectively",
-    resultVerb: "will learn",
-    invertedSentence: "You will learn more effectively if you ask questions when you do not understand something.",
-    habitTitle: "Inquisitive Mindset & Clarification",
-    explanation: "Clarifying doubts immediately stops misconceptions from solidifying into hard-to-break language habits.",
+    id: 9,
+    fullSentence: "If you don't ask questions when you don't understand something, you won't learn as effectively.",
+    conditionClause: "If you don't ask questions when you don't understand something",
+    conditionVerb: "don't ask",
+    resultClause: "you won't learn as effectively",
+    resultVerb: "won't learn",
+    invertedSentence: "You won't learn as effectively if you don't ask questions when you don't understand something.",
+    habitTitle: "Inquisitive Mindset & Clarifying Doubts",
+    explanation: "Asking questions immediately resolves misunderstandings before they turn into fossilized grammar errors.",
     category: "curiosity"
   },
   {
-    id: 9,
+    id: 10,
     fullSentence: "If you use English outside the classroom, you will become more comfortable using it in real situations.",
     conditionClause: "If you use English outside the classroom",
     conditionVerb: "use",
@@ -119,20 +131,8 @@ export const STUDY_HABIT_SENTENCES: SentenceHabit[] = [
     resultVerb: "will become",
     invertedSentence: "You will become more comfortable using it in real situations if you use English outside the classroom.",
     habitTitle: "Real-World Contexts & Immersion",
-    explanation: "Switching phone settings, speaking with international friends, and grocery shopping in English removes speaking anxiety.",
+    explanation: "Applying English in daily life—media, chatting with peers, hobby content—erases anxiety in real-world speaking.",
     category: "immersion"
-  },
-  {
-    id: 10,
-    fullSentence: "If you balance grammar practice with speaking and listening activities, you will develop more complete language skills.",
-    conditionClause: "If you balance grammar practice with speaking and listening activities",
-    conditionVerb: "balance",
-    resultClause: "you will develop more complete language skills",
-    resultVerb: "will develop",
-    invertedSentence: "You will develop more complete language skills if you balance grammar practice with speaking and listening activities.",
-    habitTitle: "Holistic Four-Skill Equilibrium",
-    explanation: "A well-rounded learner blends analytical grammar comprehension with spontaneous auditory and vocal reflexes.",
-    category: "balance"
   }
 ];
 
@@ -266,29 +266,16 @@ export const MODAL_EXCEPTIONS: ModalException[] = [
     }
   },
   {
-    modal: "may",
-    meaning: "Formal Possibility or Polite Likelihood",
-    nuance: "Replaces 'will' to indicate a 50% likelihood or formal probability that something good will happen.",
-    formula: "If + Present Simple, Subject + MAY + Base Verb",
+    modal: "should",
+    meaning: "Suggestion, Recommendation, or Advice",
+    nuance: "Replaces 'will' to give a helpful recommendation or suggest the best study practice rather than stating a guaranteed future certainty.",
+    formula: "If + Present Simple, Subject + SHOULD + Base Verb",
     example: {
-      ifPart: "If you join an international language exchange community",
-      mainPart: "you may find a dedicated study buddy with shared academic interests",
-      fullSentence: "If you join an international language exchange community, you may find a dedicated study buddy with shared academic interests.",
-      modalUsed: "may find (expresses formal possibility / probability)",
-      explanation: "Finding a study partner is a plausible, favorable outcome."
-    }
-  },
-  {
-    modal: "might",
-    meaning: "Slight Possibility or Remote Chance",
-    nuance: "Replaces 'will' when the consequence is possible, but less certain than 'will' or 'may' (a tentative outcome).",
-    formula: "If + Present Simple, Subject + MIGHT + Base Verb",
-    example: {
-      ifPart: "If you read advanced English classic literature",
-      mainPart: "you might encounter poetic vocabulary that challenges your reading speed",
-      fullSentence: "If you read advanced English classic literature, you might encounter poetic vocabulary that challenges your reading speed.",
-      modalUsed: "might encounter (expresses slight, tentative possibility)",
-      explanation: "Complex texts might present unusual or archaic vocabulary."
+      ifPart: "If you want to improve your English pronunciation",
+      mainPart: "you should read aloud for fifteen minutes every day",
+      fullSentence: "If you want to improve your English pronunciation, you should read aloud for fifteen minutes every day.",
+      modalUsed: "should read (expresses a helpful suggestion & study recommendation)",
+      explanation: "Reading aloud trains mouth muscle memory and speech rhythm, making it an excellent study habit to recommend."
     }
   }
 ];
